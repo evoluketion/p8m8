@@ -1,0 +1,16 @@
+QMainWindow {
+    background-color: #1d2b53;
+}
+
+QTextEdit {
+    background-color: #1d2b53;
+    font-family: "PICO-8";
+    color: #c2c3c7;
+    border: 1px solid #1d2b53;
+}
+
+QToolBar {
+    background-color: #ff004d;
+    border: none;
+    height: 100vh;
+}
