@@ -1,6 +1,6 @@
 import sys
 from PyQt6.QtCore import QEvent, Qt
-from PyQt6.QtWidgets import QApplication, QSizePolicy, QStyle, QToolButton, QWidget, QMainWindow, QTextEdit, QHBoxLayout, QVBoxLayout, QToolBar
+from PyQt6.QtWidgets import QApplication, QLabel, QMenuBar, QSizePolicy, QStyle, QToolButton, QWidget, QMainWindow, QTextEdit, QHBoxLayout, QVBoxLayout, QToolBar
 from PyQt6.QtGui import QFontDatabase, QFont
 
 class MainToolbar(QToolBar):
@@ -13,37 +13,49 @@ class MainToolbar(QToolBar):
         toolbar_height = int(window_height * 0.06)
         self.setFixedHeight(toolbar_height)
 
-        # File button
-        self.file_button = self._make_button("file")
+        # Menu bar
+        self.createMenuBar("file")
 
-        spacer = Spacer(self)
+        spacer = MainToolbarSpacer(self)
 
         # Minimize button
-        self.minimize_button = self._make_button("-")
+        self.minimize_button = self.createButton("-")
         self.minimize_button.clicked.connect(self.window().showMinimized)
 
         # Normal button
-        self.normal_button = self._make_button("■")
+        self.normal_button = self.createButton("■")
         self.normal_button.clicked.connect(self.window().showNormal)
         self.normal_button.setVisible(False)
 
         # Maximize button
-        self.maximize_button = self._make_button("ロ")
+        self.maximize_button = self.createButton("ロ")
         self.maximize_button.clicked.connect(self.window().showMaximized)
 
         # Close button
-        self.close_button = self._make_button("x")
+        self.close_button = self.createButton("x")
         self.close_button.clicked.connect(self.window().close)
 
         # Add buttons to the toolbar
-        self.addWidget(self.file_button)
         self.addWidget(spacer)
         self.addWidget(self.minimize_button)
         self.normal_action = self.addWidget(self.normal_button)
         self.maximize_action = self.addWidget(self.maximize_button)
         self.addWidget(self.close_button)
 
-    def _make_button(self, text):
+    def createMenuBar(self, text):
+        menuBar = MenuBar(self)
+        file_menu = menuBar.addMenu(text)
+        file_menu.addAction("new")
+        file_menu.addAction("open")
+        file_menu.addAction("save")
+        file_menu.addAction("save as")
+
+        menuBar.setCursor(Qt.CursorShape.PointingHandCursor)
+        file_menu.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        self.addWidget(menuBar)
+
+    def createButton(self, text):
         btn = QToolButton(self)
         btn.setText(text)
         btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -58,7 +70,17 @@ class MainToolbar(QToolBar):
             self.maximize_action.setVisible(True)
 
 
-class Spacer(QWidget):
+class MenuBar(QMenuBar):
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Maximum,
+            QSizePolicy.Policy.Preferred
+        )
+
+
+class MainToolbarSpacer(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -76,9 +98,19 @@ class Spacer(QWidget):
 
 class Editor(QTextEdit):
 
-    def __init__(self, window_height, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedHeight(int(window_height * 0.88))
+        self.textChanged.connect(self.checkTextDetails)
+        self.cursorPositionChanged.connect(self.checkTextDetails)
+    
+    def checkTextDetails(self, ):
+        text = self.toPlainText()
+        char_count = len(text)
+        self.window().footer.char_count_label.setText(f"{char_count}/8192")
+
+        current_line = self.textCursor().blockNumber() + 1
+        line_count = text.count("\n") + 1
+        self.window().footer.line_count_label.setText(f"line {current_line}/{line_count}")
 
 
 class Footer(QToolBar):
@@ -88,6 +120,26 @@ class Footer(QToolBar):
         self.setMovable(False)
         self.setFloatable(False)
         self.setFixedHeight(int(window_height * 0.06))
+
+        self.line_count_label = QLabel("line 1/1", self)
+        self.addWidget(self.line_count_label)
+
+        spacer = FooterSpacer(self)
+
+        self.addWidget(spacer)
+
+        self.char_count_label = QLabel("0/8192", self)
+        self.addWidget(self.char_count_label)
+
+
+class FooterSpacer(QWidget):
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred
+        )
 
 
 class p8m8(QMainWindow):
@@ -119,7 +171,7 @@ class p8m8(QMainWindow):
         self.main_toolbar = MainToolbar(self.screenHeight, self)
         self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.main_toolbar)
 
-        self.editor = Editor(self.screenHeight, self)
+        self.editor = Editor(self)
         self.layout.addWidget(self.editor)
 
         self.footer = Footer(self.screenHeight, self)
@@ -128,6 +180,7 @@ class p8m8(QMainWindow):
     def changeEvent(self, event):
         if event.type() == QEvent.Type.WindowStateChange:
             self.main_toolbar.window_state_changed(self.windowState())
+
         super().changeEvent(event)
         event.accept()
 
