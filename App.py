@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QEvent, Qt
 from PyQt6.QtWidgets import QApplication, QSizePolicy, QStyle, QToolButton, QWidget, QMainWindow, QTextEdit, QHBoxLayout, QVBoxLayout, QToolBar
 from PyQt6.QtGui import QFontDatabase, QFont
 
@@ -16,29 +16,31 @@ class MainToolbar(QToolBar):
         # File button
         self.file_button = self._make_button("file")
 
-        # Toolbar Spacer
-        spacer = QWidget()
-        spacer.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Preferred
-        )
+        spacer = Spacer(self)
 
         # Minimize button
         self.minimize_button = self._make_button("-")
         self.minimize_button.clicked.connect(self.window().showMinimized)
 
+        # Normal button
+        self.normal_button = self._make_button("■")
+        self.normal_button.clicked.connect(self.window().showNormal)
+        self.normal_button.setVisible(False)
+
         # Maximize button
-        self.maximize_button = self._make_button("□")
+        self.maximize_button = self._make_button("ロ")
         self.maximize_button.clicked.connect(self.window().showMaximized)
 
         # Close button
         self.close_button = self._make_button("x")
         self.close_button.clicked.connect(self.window().close)
 
+        # Add buttons to the toolbar
         self.addWidget(self.file_button)
         self.addWidget(spacer)
         self.addWidget(self.minimize_button)
-        self.addWidget(self.maximize_button)
+        self.normal_action = self.addWidget(self.normal_button)
+        self.maximize_action = self.addWidget(self.maximize_button)
         self.addWidget(self.close_button)
 
     def _make_button(self, text):
@@ -46,6 +48,30 @@ class MainToolbar(QToolBar):
         btn.setText(text)
         btn.setCursor(Qt.CursorShape.PointingHandCursor)
         return btn
+    
+    def window_state_changed(self, state):
+        if state == Qt.WindowState.WindowMaximized:
+            self.normal_action.setVisible(True)
+            self.maximize_action.setVisible(False)
+        else:
+            self.normal_action.setVisible(False)
+            self.maximize_action.setVisible(True)
+
+
+class Spacer(QWidget):
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred
+        )
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.window().windowHandle().startSystemMove()
+        super().mousePressEvent(event)
+        event.accept()
 
 
 class Editor(QTextEdit):
@@ -86,7 +112,6 @@ class p8m8(QMainWindow):
 
         self.init_ui()
 
-
     def init_ui(self):
         with open("styles/style.qss", "r") as f:
             self.setStyleSheet(f.read())
@@ -99,6 +124,12 @@ class p8m8(QMainWindow):
 
         self.footer = Footer(self.screenHeight, self)
         self.addToolBar(Qt.ToolBarArea.BottomToolBarArea, self.footer)
+
+    def changeEvent(self, event):
+        if event.type() == QEvent.Type.WindowStateChange:
+            self.main_toolbar.window_state_changed(self.windowState())
+        super().changeEvent(event)
+        event.accept()
 
 
 app = QApplication(sys.argv)
