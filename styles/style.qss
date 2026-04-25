@@ -12,5 +12,17 @@ QTextEdit {
 QToolBar {
     background-color: #ff004d;
     border: none;
-    height: 100vh;
+}
+
+QToolButton {
+    background-color: transparent;
+    color: #c2c3c7;
+    font-family: "PICO-8";
+    font-size: 18px;
+    border: none;
+}
+
+QToolButton:hover {
+    background-color: #ff004d;
+    color: #fff;
 }
