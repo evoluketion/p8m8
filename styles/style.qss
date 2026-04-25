@@ -7,6 +7,34 @@ QTextEdit {
     font-family: "PICO-8";
     color: #c2c3c7;
     border: 1px solid #1d2b53;
+    selection-background-color: #ffec27;
+    selection-color: #c2c3c7;
+}
+
+QMenuBar {
+    background-color: #ff004d;
+    color: #c2c3c7;
+    font-family: "PICO-8";
+    font-size: 22px;
+    padding-top: 1px;
+}
+
+QMenuBar::item:hover {
+    background-color: #fff;
+    color: #ff004d;
+}
+
+QMenu {
+    background-color: #5f574f;
+    color: #c2c3c7;
+    font-family: "PICO-8";
+    font-size: 18px;
+    padding-top: 10px;
+}
+
+QMenu::item:selected {
+    background-color: #ff004d;
+    color: #fff;
 }
 
 QToolBar {
@@ -25,4 +53,11 @@ QToolButton {
 QToolButton:hover {
     background-color: #ff004d;
     color: #fff;
+}
+
+QLabel {
+    color: #7e2553;
+    font-family: "PICO-8";
+    font-size: 22px;
+
 }
