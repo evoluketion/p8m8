@@ -103,7 +103,7 @@ class Editor(QTextEdit):
         super().__init__(parent)
         self.textChanged.connect(self.checkTextDetails)
         self.cursorPositionChanged.connect(self.checkTextDetails)
-    
+
     def checkTextDetails(self):
         text = self.toPlainText()
         tokenCount = self.processTokens(text)
@@ -172,6 +172,12 @@ class Editor(QTextEdit):
             prev_kind = kind
 
         return token_count
+    
+    def contextMenuEvent(self, event):
+        menu = self.createStandardContextMenu()
+        for action in menu.actions():
+            action.setText(action.text().lower())
+        menu.exec(event.globalPos())
 
 
 class Footer(QToolBar):
