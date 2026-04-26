@@ -135,7 +135,8 @@ class Editor(QTextEdit):
         )
 
         number_re = re.compile(
-            r'0[xX][0-9a-fA-F]*\.?[0-9a-fA-F]*|[0-9]+\.?[0-9]*(?:[eE][+-]?[0-9]+)?'
+            r'0[x][0-9a-f]*\.?[0-9a-f]*|[0-9]+\.?[0-9]*',
+            re.IGNORECASE
         )
 
         FREE = {'COMMENT', 'KW_FREE', 'CLOSE_BRACKET', 'PUNCT_FREE', 'SKIP'}
