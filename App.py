@@ -1,8 +1,8 @@
 import re
 import sys
 from PyQt6.QtCore import QEvent, Qt
-from PyQt6.QtWidgets import QApplication, QLabel, QMenuBar, QSizePolicy, QStyle, QToolButton, QWidget, QMainWindow, QTextEdit, QHBoxLayout, QVBoxLayout, QToolBar
-from PyQt6.QtGui import QFontDatabase, QFont
+from PyQt6.QtWidgets import QApplication, QFileDialog, QLabel, QMenuBar, QSizePolicy, QStyle, QTabWidget, QToolButton, QWidget, QMainWindow, QTextEdit, QHBoxLayout, QVBoxLayout, QToolBar
+from PyQt6.QtGui import QFontDatabase, QFont, QTextOption
 
 class MainToolbar(QToolBar):
 
@@ -51,6 +51,9 @@ class MainToolbar(QToolBar):
         file_menu.addAction("save")
         file_menu.addAction("save as")
 
+        open_action = file_menu.actions()[1]
+        open_action.triggered.connect(menuBar.openFile)
+
         menuBar.setCursor(Qt.CursorShape.PointingHandCursor)
         file_menu.setCursor(Qt.CursorShape.PointingHandCursor)
 
@@ -71,6 +74,24 @@ class MainToolbar(QToolBar):
             self.maximize_action.setVisible(True)
 
 
+class TabWidget(QTabWidget):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setTabsClosable(True)
+        self.tabCloseRequested.connect(self.closeTab)
+
+    def addTab(self, widget, title):
+        super().addTab(widget, title)
+        self.setCurrentWidget(widget)
+
+    def insertTab(self, index, widget, label=""):
+        return super().insertTab(index, widget, label)
+
+    def closeTab(self, index):
+        self.removeTab(index)
+
+
 class MenuBar(QMenuBar):
     
     def __init__(self, parent=None):
@@ -79,7 +100,59 @@ class MenuBar(QMenuBar):
             QSizePolicy.Policy.Maximum,
             QSizePolicy.Policy.Preferred
         )
+    
+    def openFile(self):
 
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Pico 8 Files (*.p8)")
+
+        openFileRegex = [
+            ('LUA',       r'__lua__(.*)\n__gfx__'),
+            ('GFX',       r'__gfx__(.*)\n__label__'),
+            ('LABEL',     r'__label__(.*)\n__gff__'),
+            ('GFF',       r'__gff__(.*)\n__map__'),
+            ('MAP',       r'__map__(.*)\n__sfx__'),
+            ('SFX',       r'__sfx__(.*)\n'),
+        ]
+
+        if fileName:
+            with open(fileName, 'r') as file:
+                rawFileContent = file.read()
+                sections = {}
+                for name, pattern in openFileRegex:
+                    match = re.search(pattern, rawFileContent, re.DOTALL)
+                    sections[name] = match.group(1).strip() if match else ""
+
+                # Have included the other sections in case I want to add features related to them in the future, but for now only the LUA section is used
+                lua, gfx, label, gff, map_data, sfx = sections['LUA'], sections['GFX'], sections['LABEL'], sections['GFF'], sections['MAP'], sections['SFX']
+                
+                self.window().total_tokens = 0
+                tab_contents = lua.split("-->8") if "-->8" in lua else [lua.strip()]
+                for i, content in enumerate(tab_contents):
+                    editor = Editor(self)
+                    strippedContent = content.strip()
+                    editor.setPlainText(strippedContent)
+
+                    tabTitle = self.getTabName(strippedContent, fileName, i)
+                    
+                    tabLayout = QHBoxLayout()
+                    tabLayout.setContentsMargins(0, 0, 0, 0)
+                    tabLayout.setSpacing(0)
+                    line_number_area = LineNumberArea(editor)
+                    tabLayout.addWidget(line_number_area)
+                    tabLayout.addWidget(editor)
+
+                    tabLayoutWidget = QWidget()
+                    tabLayoutWidget.setLayout(tabLayout)
+                    
+                    self.window().tab_widget.addTab(tabLayoutWidget, tabTitle)
+        
+        self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
+
+    def getTabName(self, strippedContent, fileName, i):
+        firstLine = strippedContent.splitlines()[0] if strippedContent else "untitled"
+        comment_match = re.match(r'--\s*(.*)', firstLine)
+        tabTitle = comment_match.group(1).strip() if comment_match else f"{fileName.split('/')[-1]}_{i}"
+        return tabTitle
 
 class MainToolbarSpacer(QWidget):
     
@@ -97,17 +170,45 @@ class MainToolbarSpacer(QWidget):
         event.accept()
 
 
+class LineNumberArea(QTextEdit):
+
+    def __init__(self, editor):
+        super().__init__(editor)
+        self.editor = editor
+        self.setReadOnly(True)
+        self.setFixedWidth(40)
+        self.setObjectName("lineNumberArea")
+
+        option = QTextOption()
+        option.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.document().setDefaultTextOption(option)
+        
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
+        self.editor.textChanged.connect(self.updateLineNumbers)
+        self.editor.verticalScrollBar().valueChanged.connect(self.verticalScrollBar().setValue)
+        self.updateLineNumbers()
+
+    def updateLineNumbers(self):
+        self.setPlainText("\n".join(str(i + 1) for i in range(self.editor.document().blockCount())))
+
+
 class Editor(QTextEdit):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.base_tokens = 0
         self.textChanged.connect(self.checkTextDetails)
         self.cursorPositionChanged.connect(self.checkTextDetails)
 
     def checkTextDetails(self):
         text = self.toPlainText()
-        tokenCount = self.processTokens(text)
-        self.window().footer.char_count_label.setText(f"{tokenCount}/8192")
+        current = self.processTokens(text)
+        delta = current - self.base_tokens
+        self.base_tokens = current
+        self.window().total_tokens += delta
+        self.window().footer.char_count_label.setText(f"{self.window().total_tokens}/8192")
 
         current_line = self.textCursor().blockNumber() + 1
         line_count = text.count("\n") + 1
@@ -151,6 +252,8 @@ class Editor(QTextEdit):
             if not m:
                 pos += 1
                 continue
+            
+            # if kind == 'COMMENT' and 
 
             kind = m.lastgroup
             value = m.group()
@@ -169,7 +272,7 @@ class Editor(QTextEdit):
 
             if kind not in FREE:
                 token_count += 1
-
+            
             prev_kind = kind
 
         return token_count
@@ -217,6 +320,7 @@ class p8m8(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.total_tokens = 0
 
         QFontDatabase.addApplicationFont("assets/fonts/pico-8.otf")
 
@@ -240,7 +344,10 @@ class p8m8(QMainWindow):
         self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.main_toolbar)
 
         self.editor = Editor(self)
-        self.layout.addWidget(self.editor)
+        self.tab_widget = TabWidget()
+        self.tab_widget.setTabsClosable(False)
+        self.tab_widget.addTab(self.editor, "untitled")
+        self.layout.addWidget(self.tab_widget)
 
         self.footer = Footer(self.screenHeight, self)
         self.addToolBar(Qt.ToolBarArea.BottomToolBarArea, self.footer)
