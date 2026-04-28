@@ -2,13 +2,64 @@ QMainWindow {
     background-color: #1d2b53;
 }
 
+QTabWidget {
+    background-color: #1d2b53;
+    color: #c2c3c7;
+    font-family: "PICO-8";
+    font-size: 18px;
+    border: none;
+}
+
+QTabBar::tab {
+    background-color: #ff77a8;
+    color: #ff004d;
+    font-family: "PICO-8";
+    font-size: 18px;
+    padding: 5px;
+    margin-right: 4px;
+}
+
+QTabBar::tab:selected {
+    background-color: #fff;
+    color: #ff004d;
+}
+
 QTextEdit {
     background-color: #1d2b53;
     font-family: "PICO-8";
     color: #c2c3c7;
     border: 1px solid #1d2b53;
+    border-top: 2px solid #ff004d;
     selection-background-color: #ffec27;
     selection-color: #c2c3c7;
+}
+
+QTextEdit#lineNumberArea {
+    background-color: #1d2b53;
+    color: #c2c3c7;
+    border: none;
+    border-right: 2px solid #ff004d;
+}
+
+QScrollBar:vertical {
+    background: #1d2b53;
+    width: 15px;
+    margin: 0px 0px 0px 0px;
+    border: none;
+}
+
+QScrollBar::handle:vertical {
+    background: #5f574f;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #c2c3c7;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
 }
 
 QMenuBar {
