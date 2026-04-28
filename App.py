@@ -90,6 +90,18 @@ class TabWidget(QTabWidget):
 
     def closeTab(self, index):
         self.removeTab(index)
+    
+    def getTabLayout(self, editor):
+        tabLayout = QHBoxLayout()
+        tabLayout.setContentsMargins(0, 0, 0, 0)
+        tabLayout.setSpacing(0)
+        line_number_area = LineNumberArea(editor)
+        tabLayout.addWidget(line_number_area)
+        tabLayout.addWidget(editor)
+
+        tabLayoutWidget = QWidget()
+        tabLayoutWidget.setLayout(tabLayout)    
+        return tabLayoutWidget
 
 
 class MenuBar(QMenuBar):
@@ -134,17 +146,9 @@ class MenuBar(QMenuBar):
 
                     tabTitle = self.getTabName(strippedContent, fileName, i)
                     
-                    tabLayout = QHBoxLayout()
-                    tabLayout.setContentsMargins(0, 0, 0, 0)
-                    tabLayout.setSpacing(0)
-                    line_number_area = LineNumberArea(editor)
-                    tabLayout.addWidget(line_number_area)
-                    tabLayout.addWidget(editor)
-
-                    tabLayoutWidget = QWidget()
-                    tabLayoutWidget.setLayout(tabLayout)
+                    tabLayout = self.window().tab_widget.getTabLayout(editor)
                     
-                    self.window().tab_widget.addTab(tabLayoutWidget, tabTitle)
+                    self.window().tab_widget.addTab(tabLayout, tabTitle)
         
         self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
 
@@ -346,7 +350,11 @@ class p8m8(QMainWindow):
         self.editor = Editor(self)
         self.tab_widget = TabWidget()
         self.tab_widget.setTabsClosable(False)
-        self.tab_widget.addTab(self.editor, "untitled")
+
+        tabLayout = self.window().tab_widget.getTabLayout(self.editor)
+        
+        self.window().tab_widget.addTab(tabLayout, "untitled")
+
         self.layout.addWidget(self.tab_widget)
 
         self.footer = Footer(self.screenHeight, self)
