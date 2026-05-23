@@ -56,9 +56,15 @@ class MainToolbar(QToolBar):
     def addFileMenu(self):
         menuBar = self.findChild(MenuBar)
         file_menu = menuBar.addMenu("file")
+
         file_menu.addAction("new")
+        file_menu.setDisabled("new") # Not yet implemented, TODO
+
         file_menu.addAction("open")
+
         file_menu.addAction("save")
+        file_menu.setDisabled("save") # Not yet implemented, TODO
+
         file_menu.addAction("save as")
 
         open_action = file_menu.actions()[1]
@@ -150,13 +156,16 @@ class MenuBar(QMenuBar):
         self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
 
     def saveFileAs(self):
-        fileName = QFileDialog.getSaveFileName(self, "Save File", "", "Pico 8 Files (*.p8)")
+        fileName, fileType = QFileDialog.getSaveFileName(self, "Save File", "", "Pico 8 Files (*.p8)")
         if fileName:
             try:
+                # Editor should only be able to save files as Pico 8 cartridges
+                if not fileName.endswith(".p8"):
+                    fileName += ".p8"
+                
                 with open(fileName, 'w') as f:
-                    f = open(fileName, 'w')
-
                     editorText = str(self.window().tab_widget.formatFileContent())
+                    print(f"Saving file with content:\n{editorText}")
 
                     f.write(editorText)
                     f.close()

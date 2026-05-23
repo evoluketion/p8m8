@@ -1,7 +1,6 @@
-import codecs
+import re
 
 from PyQt6.QtWidgets import QTabWidget, QWidget, QHBoxLayout
-from PyQt6.QtCore import QByteArray
 from components.Editor import Editor
 from components.LineNumberArea import LineNumberArea
 
@@ -38,8 +37,27 @@ class TabWidget(QTabWidget):
         tabWidgetContent = super().findChildren(Editor)
 
         fileContent = ""
+
+        # Default to version 1 if not set in prefs
+        # is a ridiculously out of date version to prompt the User 
+        # something is wrong with their prefs config
+        pico8VersionNumber = self.window().prefs.get("pico_8_version_number", 1) 
+        
+        fileSpecsStr = f"pico-8 cartridge // http://www.pico-8.com\nversion {pico8VersionNumber}\n__lua__\n\n"
+        gfxStr = """\n\n__gfx__
+                    00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+                    00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+                    00700700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+                    00077000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+                    00077000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+                    00700700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"""
         for tab in tabWidgetContent:
             editorText = tab.toPlainText()
-            fileContent += (editorText + "\n\n")
-
-        return fileContent
+            firstLine = editorText.splitlines()[0] if editorText else ""
+            comment_match = re.match(r'--\s*(.*)', firstLine)
+            if not comment_match:
+                editorText = f"--untitled\n {editorText}"
+            
+            fileContent = f"{fileContent}\n-->8\n{editorText}" if fileContent else editorText
+    
+        return fileSpecsStr + fileContent + gfxStr.replace(" ", "")
