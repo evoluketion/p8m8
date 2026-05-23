@@ -58,17 +58,18 @@ class MainToolbar(QToolBar):
         file_menu = menuBar.addMenu("file")
 
         file_menu.addAction("new")
-        file_menu.setDisabled("new") # Not yet implemented, TODO
-
         file_menu.addAction("open")
-
         file_menu.addAction("save")
-        file_menu.setDisabled("save") # Not yet implemented, TODO
-
         file_menu.addAction("save as")
 
+        new_action = file_menu.actions()[0]
+        new_action.setEnabled(False)  # Functionality not implemented yet, TODO
+        
         open_action = file_menu.actions()[1]
         open_action.triggered.connect(menuBar.openFile)
+
+        save_action = file_menu.actions()[2]
+        save_action.setEnabled(False)  # Functionality not implemented yet, TODO
 
         save_as_action = file_menu.actions()[3]
         save_as_action.triggered.connect(menuBar.saveFileAs)
