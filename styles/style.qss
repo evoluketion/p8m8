@@ -95,6 +95,11 @@ QMenu::item:selected {
     color: #fff;
 }
 
+QMenu::item:disabled {
+    color: #6d655c;
+    opacity: 0.6;
+}
+
 QToolBar {
     background-color: #ff004d;
     border: none;
