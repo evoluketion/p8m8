@@ -1,4 +1,8 @@
+import codecs
+
 from PyQt6.QtWidgets import QTabWidget, QWidget, QHBoxLayout
+from PyQt6.QtCore import QByteArray
+from components.Editor import Editor
 from components.LineNumberArea import LineNumberArea
 
 class TabWidget(QTabWidget):
@@ -27,5 +31,15 @@ class TabWidget(QTabWidget):
         tabLayout.addWidget(editor)
 
         tabLayoutWidget = QWidget()
-        tabLayoutWidget.setLayout(tabLayout)    
+        tabLayoutWidget.setLayout(tabLayout)  
         return tabLayoutWidget
+
+    def formatFileContent(self):
+        tabWidgetContent = super().findChildren(Editor)
+
+        fileContent = ""
+        for tab in tabWidgetContent:
+            editorText = tab.toPlainText()
+            fileContent += (editorText + "\n\n")
+
+        return fileContent

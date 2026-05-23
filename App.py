@@ -6,6 +6,7 @@ from components.MainToolbar import MainToolbar
 from components.Editor import Editor
 from components.TabWidget import TabWidget
 from components.Footer import Footer
+from config.prefs import Prefs
 
 
 class p8m8(QMainWindow):
@@ -14,6 +15,9 @@ class p8m8(QMainWindow):
     screenHeight = 720
 
     def __init__(self):
+
+        self.prefs = Prefs()
+
         super().__init__()
         self.total_tokens = 0
 
@@ -60,6 +64,7 @@ class p8m8(QMainWindow):
 
 
 app = QApplication(sys.argv)
+app.prefs = Prefs()
 window = p8m8()
 window.show()
 sys.exit(app.exec())
