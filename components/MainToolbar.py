@@ -1,6 +1,6 @@
 import re
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QFileDialog, QMenuBar, QSizePolicy, QToolButton, QWidget, QToolBar
+from PyQt6.QtWidgets import QApplication, QFileDialog, QMenuBar, QSizePolicy, QToolButton, QWidget, QToolBar
 
 
 class MainToolbar(QToolBar):
@@ -8,6 +8,7 @@ class MainToolbar(QToolBar):
     def __init__(self, window_height, parent=None, editor_class=None):
         super().__init__(parent)
         self._editor_class = editor_class
+        self.prefs = QApplication.instance().prefs
 
         self.setMovable(False)
         self.setFloatable(False)
@@ -15,7 +16,7 @@ class MainToolbar(QToolBar):
         self.setFixedHeight(toolbar_height)
 
         # Menu bar
-        self.createMenuBar("file")
+        self.createMenuBar()
 
         spacer = MainToolbarSpacer(self)
 
@@ -42,10 +43,19 @@ class MainToolbar(QToolBar):
         self.normal_action = self.addWidget(self.normal_button)
         self.maximize_action = self.addWidget(self.maximize_button)
         self.addWidget(self.close_button)
-
-    def createMenuBar(self, text):
+    
+    def createMenuBar(self):
         menuBar = MenuBar(self, self._editor_class)
-        file_menu = menuBar.addMenu(text)
+
+        self.addFileMenu()
+        self.addViewMenu()
+
+        menuBar.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.addWidget(menuBar)
+
+    def addFileMenu(self):
+        menuBar = self.findChild(MenuBar)
+        file_menu = menuBar.addMenu("file")
         file_menu.addAction("new")
         file_menu.addAction("open")
         file_menu.addAction("save")
@@ -54,10 +64,25 @@ class MainToolbar(QToolBar):
         open_action = file_menu.actions()[1]
         open_action.triggered.connect(menuBar.openFile)
 
-        menuBar.setCursor(Qt.CursorShape.PointingHandCursor)
-        file_menu.setCursor(Qt.CursorShape.PointingHandCursor)
+        save_as_action = file_menu.actions()[3]
+        save_as_action.triggered.connect(menuBar.saveFileAs)
 
-        self.addWidget(menuBar)
+        file_menu.setCursor(Qt.CursorShape.PointingHandCursor)
+    
+    def addViewMenu(self):
+        menuBar = self.findChild(MenuBar)
+        view_menu = menuBar.addMenu("view")
+
+        view_menu_editor_menu = view_menu.addMenu("editor")
+        view_menu_editor_menu.addAction("tab spaces")
+
+        tab_spaces_action = view_menu_editor_menu.actions()[0]
+        tab_spaces_action.setCheckable(True)
+        tab_spaces_action.setChecked(self.prefs.get("show_tab_spaces", True))
+        tab_spaces_action.toggled.connect(lambda checked: self.prefs.set("show_tab_spaces", checked))
+
+        view_menu.setCursor(Qt.CursorShape.PointingHandCursor)
+        view_menu_editor_menu.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def createButton(self, text):
         btn = QToolButton(self)
@@ -123,6 +148,20 @@ class MenuBar(QMenuBar):
                     self.window().tab_widget.addTab(tabLayout, tabTitle)
 
         self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
+
+    def saveFileAs(self):
+        fileName = QFileDialog.getSaveFileName(self, "Save File", "", "Pico 8 Files (*.p8)")
+        if fileName:
+            try:
+                with open(fileName, 'w') as f:
+                    f = open(fileName, 'w')
+
+                    editorText = str(self.window().tab_widget.formatFileContent())
+
+                    f.write(editorText)
+                    f.close()
+            except Exception as e:
+                print(f"Error saving file {e}")
 
     def getTabName(self, strippedContent, fileName, i):
         firstLine = strippedContent.splitlines()[0] if strippedContent else "untitled"

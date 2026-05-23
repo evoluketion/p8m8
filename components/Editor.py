@@ -1,13 +1,23 @@
-from PyQt6.QtWidgets import QTextEdit
+from PyQt6.QtWidgets import QApplication, QTextEdit
+from PyQt6.QtGui import QTextOption
 import re
 
 class Editor(QTextEdit):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        prefs = QApplication.instance().prefs
+
         self.base_tokens = 0
         self.textChanged.connect(self.checkTextDetails)
         self.cursorPositionChanged.connect(self.checkTextDetails)
+
+        if prefs.get("show_tab_spaces"):
+            option = QTextOption()
+            option.setFlags(QTextOption.Flag.ShowTabsAndSpaces)
+            option.setTabStopDistance(30)
+            self.document().setDefaultTextOption(option)
 
     def checkTextDetails(self):
         text = self.toPlainText()
