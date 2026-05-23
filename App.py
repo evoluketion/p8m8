@@ -25,7 +25,7 @@ class p8m8(QMainWindow):
 
         self.width, self.height = self.screenWidth, self.screenHeight
         self.setMinimumSize(self.width, self.height)
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint)
         with open("styles/style.qss", "r") as f:
             self.setStyleSheet(f.read())
         
@@ -63,6 +63,7 @@ class p8m8(QMainWindow):
         event.accept()
 
 
+QApplication.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeMenuBar)
 app = QApplication(sys.argv)
 app.prefs = Prefs()
 window = p8m8()
