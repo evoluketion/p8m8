@@ -154,7 +154,7 @@ class MenuBar(QMenuBar):
 
                     self.window().tab_widget.addTab(tabLayout, tabTitle)
 
-        self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
+            self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
 
     def saveFileAs(self):
         fileName, fileType = QFileDialog.getSaveFileName(self, "Save File", "", "Pico 8 Files (*.p8)")
