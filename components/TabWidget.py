@@ -61,3 +61,10 @@ class TabWidget(QTabWidget):
             fileContent = f"{fileContent}\n-->8\n{editorText}" if fileContent else editorText
     
         return fileSpecsStr + fileContent + gfxStr.replace(" ", "")
+
+    def handleTabBarClicked(self, index):
+        if index == self.count() - 1:  # If the "+" tab is clicked
+            newEditor = Editor(self)
+            newTabLayout = self.getTabLayout(newEditor)
+            self.insertTab(self.count() - 1, newTabLayout, "untitled")
+            self.setCurrentIndex(self.count() - 2)  # Switch to the new tab

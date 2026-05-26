@@ -49,8 +49,11 @@ class p8m8(QMainWindow):
         tabLayout = self.window().tab_widget.getTabLayout(self.editor)
         
         self.window().tab_widget.addTab(tabLayout, "untitled")
+        self.window().tab_widget.addTab(QWidget(), "+")
+        self.window().tab_widget.tabBarClicked.connect(self.window().tab_widget.handleTabBarClicked)
 
         self.layout.addWidget(self.tab_widget)
+        self.window().tab_widget.setCurrentIndex(0)
 
         self.footer = Footer(self.screenHeight, self)
         self.addToolBar(Qt.ToolBarArea.BottomToolBarArea, self.footer)
