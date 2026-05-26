@@ -157,7 +157,7 @@ class MenuBar(QMenuBar):
             self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
 
     def saveFileAs(self):
-        fileName, fileType = QFileDialog.getSaveFileName(self, "Save File", "", "Pico 8 Files (*.p8)")
+        fileName, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Pico 8 Files (*.p8)")
         if fileName:
             try:
                 # Editor should only be able to save files as Pico 8 cartridges
