@@ -62,6 +62,41 @@ QScrollBar::sub-line:vertical {
     height: 0px;
 }
 
+QScrollBar:horizontal {
+    background: #1d2b53;
+    height: 15px;
+    margin: 0px 0px 0px 0px;
+    border: none;
+}
+
+QScrollBar::handle:horizontal {
+    background: #5f574f;
+    min-width: 20px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #c2c3c7;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #5f574f;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #c2c3c7;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
 QMenuBar {
     background-color: #ff004d;
     color: #c2c3c7;
