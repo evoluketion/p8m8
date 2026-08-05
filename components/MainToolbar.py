@@ -131,6 +131,9 @@ class MenuBar(QMenuBar):
         ]
 
         if fileName:
+
+            self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
+
             with open(fileName, 'r') as file:
                 rawFileContent = file.read()
                 sections = {}
@@ -154,7 +157,9 @@ class MenuBar(QMenuBar):
 
                     self.window().tab_widget.addTab(tabLayout, tabTitle)
 
-            self.window().tab_widget.removeTab(0)  # Remove the initial empty tab
+            self.window().tab_widget.tabBar().moveTab(0, self.window().tab_widget.count() - 1)  # Move the + tab to the last position
+            self.window().tab_widget.setCurrentIndex(0)
+
 
     def saveFileAs(self):
         fileName, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Pico 8 Files (*.p8)")
