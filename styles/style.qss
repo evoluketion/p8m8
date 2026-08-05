@@ -117,3 +117,9 @@ QToolButton:hover {
     background-color: #ff004d;
     color: #fff;
 }
+
+QLabel#lineCountLabel, QLabel#charCountLabel {
+    color: #7e2553;
+    font-family: "PICO-8";
+    font-size: 22px;
+}
