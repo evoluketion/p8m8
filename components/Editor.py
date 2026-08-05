@@ -19,6 +19,11 @@ class Editor(QTextEdit):
             option.setTabStopDistance(30)
             self.document().setDefaultTextOption(option)
 
+        if prefs.get("wrap_text"):
+            self.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
+        else:
+            self.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+
     def checkTextDetails(self):
         text = self.toPlainText()
         current = self.processTokens(text)

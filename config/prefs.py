@@ -3,6 +3,7 @@ import os
 
 DEFAULTS = {
     "show_tab_spaces": True,
+    "wrap_text": False
 }
 
 PREFS_PATH = "prefs.json"

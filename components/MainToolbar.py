@@ -82,11 +82,17 @@ class MainToolbar(QToolBar):
 
         view_menu_editor_menu = view_menu.addMenu("editor")
         view_menu_editor_menu.addAction("tab spaces")
+        view_menu_editor_menu.addAction("wrap text")
 
         tab_spaces_action = view_menu_editor_menu.actions()[0]
         tab_spaces_action.setCheckable(True)
         tab_spaces_action.setChecked(self.prefs.get("show_tab_spaces", True))
         tab_spaces_action.toggled.connect(lambda checked: self.prefs.set("show_tab_spaces", checked))
+
+        wrap_text_action = view_menu_editor_menu.actions()[1]
+        wrap_text_action.setCheckable(True)
+        wrap_text_action.setChecked(self.prefs.get("wrap_text", False))
+        wrap_text_action.toggled.connect(lambda checked: self.prefs.set("wrap_text", checked))
 
         view_menu.setCursor(Qt.CursorShape.PointingHandCursor)
         view_menu_editor_menu.setCursor(Qt.CursorShape.PointingHandCursor)
