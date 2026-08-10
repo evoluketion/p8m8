@@ -2,8 +2,8 @@ import json
 import os
 
 DEFAULTS = {
-    "show_tab_spaces": True,
-    "wrap_text": False
+    "show_tab_spaces": False,
+    "wrap_text": True
 }
 
 PREFS_PATH = "prefs.json"
