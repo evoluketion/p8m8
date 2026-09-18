@@ -11,15 +11,13 @@ from config.prefs import Prefs
 
 class p8m8(QMainWindow):
 
-    screenWidth = 1280
-    screenHeight = 720
-
     def __init__(self):
 
         self.prefs = Prefs()
+        self.screenWidth = 1280
+        self.screenHeight = 720
 
         super().__init__()
-        self.total_tokens = 0
 
         QFontDatabase.addApplicationFont("assets/fonts/pico-8.otf")
 
@@ -39,8 +37,8 @@ class p8m8(QMainWindow):
         with open("styles/style.qss", "r") as f:
             self.setStyleSheet(f.read())
 
-        self.main_toolbar = MainToolbar(self.screenHeight, self, Editor)
-        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.main_toolbar)
+        self.mainToolbar = MainToolbar(self.screenHeight, self, Editor)
+        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.mainToolbar)
 
         self.editor = Editor(self)
         self.tab_widget = TabWidget()
@@ -60,7 +58,7 @@ class p8m8(QMainWindow):
 
     def changeEvent(self, event):
         if event.type() == QEvent.Type.WindowStateChange:
-            self.main_toolbar.window_state_changed(self.windowState())
+            self.mainToolbar.window_state_changed(self.windowState())
 
         super().changeEvent(event)
         event.accept()

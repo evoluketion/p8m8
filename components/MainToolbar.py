@@ -2,13 +2,13 @@ import re
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QFileDialog, QMenuBar, QSizePolicy, QToolButton, QWidget, QToolBar
 
-
 class MainToolbar(QToolBar):
 
     def __init__(self, window_height, parent=None, editor_class=None):
         super().__init__(parent)
         self._editor_class = editor_class
         self.prefs = QApplication.instance().prefs
+        self.fileOpening = False
 
         self.setMovable(False)
         self.setFloatable(False)
@@ -150,7 +150,7 @@ class MenuBar(QMenuBar):
                 # Have included the other sections in case I want to add features related to them in the future, but for now only the LUA section is used
                 lua, gfx, label, gff, map_data, sfx = sections['LUA'], sections['GFX'], sections['LABEL'], sections['GFF'], sections['MAP'], sections['SFX']
 
-                self.window().total_tokens = 0
+                self.window().mainToolbar.fileOpening = True
                 tab_contents = lua.split("-->8") if "-->8" in lua else [lua.strip()]
                 for i, content in enumerate(tab_contents):
                     editor = Editor(self)
@@ -165,6 +165,7 @@ class MenuBar(QMenuBar):
 
             self.window().tab_widget.tabBar().moveTab(0, self.window().tab_widget.count() - 1)  # Move the + tab to the last position
             self.window().tab_widget.setCurrentIndex(0)
+            self.window().mainToolbar.fileOpening = False
 
 
     def saveFileAs(self):
