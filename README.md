@@ -2,6 +2,8 @@
 
 A lightweight, custom-built code editor for [PICO-8](https://www.pico-8.com/) Lua cartridges, built with PyQt6.
 
+<img width="1916" height="1075" alt="p8m8" src="https://github.com/user-attachments/assets/f8b46057-84be-4164-9b0f-ada29ed49518" />
+
 ## Features
 
 - **Tabbed editing** — Opening a `.p8` cartridge splits its Lua source on `-->8` markers into separate tabs, mirroring PICO-8's own multi-tab code editor. New tabs can be added with the `+` tab.
