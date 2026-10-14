@@ -44,11 +44,11 @@ class p8m8(QMainWindow):
         self.tab_widget = TabWidget()
         self.tab_widget.setTabsClosable(False)
 
-        tabLayout = self.window().tab_widget.getTabLayout(self.editor)
+        tabLayout = self.window().tab_widget.get_tab_layout(self.editor)
         
         self.window().tab_widget.addTab(tabLayout, "untitled")
         self.window().tab_widget.addTab(QWidget(), "+")
-        self.window().tab_widget.tabBarClicked.connect(self.window().tab_widget.handleTabBarClicked)
+        self.window().tab_widget.tabBarClicked.connect(self.window().tab_widget.handle_tab_bar_clicked)
 
         self.layout.addWidget(self.tab_widget)
         self.window().tab_widget.setCurrentIndex(0)

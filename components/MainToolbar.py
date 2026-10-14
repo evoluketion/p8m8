@@ -159,7 +159,7 @@ class MenuBar(QMenuBar):
 
                     tabTitle = self.getTabName(strippedContent, fileName, i)
 
-                    tabLayout = self.window().tab_widget.getTabLayout(editor)
+                    tabLayout = self.window().tab_widget.get_tab_layout(editor)
 
                     self.window().tab_widget.addTab(tabLayout, tabTitle)
 
@@ -177,7 +177,7 @@ class MenuBar(QMenuBar):
                     fileName += ".p8"
                 
                 with open(fileName, 'w') as f:
-                    editorText = str(self.window().tab_widget.formatFileContent())
+                    editorText = str(self.window().tab_widget.format_file_content())
                     print(f"Saving file with content:\n{editorText}")
 
                     f.write(editorText)
