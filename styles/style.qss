@@ -34,7 +34,7 @@ QTextEdit {
     selection-color: #c2c3c7;
 }
 
-QTextEdit#lineNumberArea {
+QTextEdit#line_number_area {
     background-color: #1d2b53;
     color: #c2c3c7;
     border: none;
