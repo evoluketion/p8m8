@@ -30,7 +30,7 @@ class Editor(QTextEdit):
     def check_text_details(self):
         text = self.toPlainText()
 
-        current = self.processTokens(text)
+        current = self.process_tokens(text)
         delta = current - self.base_tokens
         self.base_tokens = current
         self.total_tokens += delta
@@ -41,7 +41,7 @@ class Editor(QTextEdit):
         line_count = self.toPlainText().count("\n") + 1
         self.window().footer.line_count_label.setText(f"line {self.current_line}/{line_count}")
 
-    def processTokens(self, text):
+    def process_tokens(self, text):
         token_patterns = [
             ('COMMENT',       r'--[^\n]*'),
             ('STRING',        r'"[^"]*"|\'[^\']*\''),
@@ -98,7 +98,7 @@ class Editor(QTextEdit):
             if kind == 'OP' and value in ('-', '~') and prev_kind not in OPERAND_KINDS:
                 num_match = number_re.match(text, pos)
                 if num_match:
-                    token_count += 1
+                    token_count += context_menu_event
                     prev_kind = 'NUMBER'
                     pos = num_match.end()
                     continue
@@ -114,7 +114,7 @@ class Editor(QTextEdit):
 
         return token_count
     
-    def contextMenuEvent(self, event):
+    def context_menu_event(self, event):
         menu = self.createStandardContextMenu()
         for action in menu.actions():
             action.setText(action.text().lower())

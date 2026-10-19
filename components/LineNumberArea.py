@@ -18,7 +18,7 @@ class LineNumberArea(QTextEdit):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         
-        self.editor.textChanged.connect(self.updateLineNumbers)
+        self.editor.textChanged.connect(self.update_line_numbers)
         self.editor.verticalScrollBar().valueChanged.connect(self.verticalScrollBar().setValue)
         self.update_line_numbers()
 
