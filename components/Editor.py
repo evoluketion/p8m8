@@ -9,12 +9,12 @@ class Editor(QTextEdit):
 
         prefs = QApplication.instance().prefs
 
-        self.baseTokens = 0
-        self.totalTokens = 0
-        self.currentLine = 0
+        self.base_tokens = 0
+        self.total_tokens = 0
+        self.current_line = 0
 
-        self.textChanged.connect(self.checkTextDetails)
-        self.cursorPositionChanged.connect(self.checkCurrentLine)
+        self.textChanged.connect(self.check_text_details)
+        self.cursorPositionChanged.connect(self.check_current_line)
 
         if prefs.get("show_tab_spaces"):
             option = QTextOption()
@@ -27,21 +27,21 @@ class Editor(QTextEdit):
         else:
             self.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
     
-    def checkTextDetails(self):
+    def check_text_details(self):
         text = self.toPlainText()
 
-        current = self.processTokens(text)
-        delta = current - self.baseTokens
-        self.baseTokens = current
-        self.totalTokens += delta
-        self.window().footer.char_count_label.setText(f"{self.totalTokens}/8192")
+        current = self.process_tokens(text)
+        delta = current - self.base_tokens
+        self.base_tokens = current
+        self.total_tokens += delta
+        self.window().footer.char_count_label.setText(f"{self.total_tokens}/8192")
 
-    def checkCurrentLine(self):
-        self.currentLine = self.textCursor().blockNumber() + 1
-        lineCount = self.toPlainText().count("\n") + 1
-        self.window().footer.line_count_label.setText(f"line {self.currentLine}/{lineCount}")
+    def check_current_line(self):
+        self.current_line = self.textCursor().blockNumber() + 1
+        line_count = self.toPlainText().count("\n") + 1
+        self.window().footer.line_count_label.setText(f"line {self.current_line}/{line_count}")
 
-    def processTokens(self, text):
+    def process_tokens(self, text):
         token_patterns = [
             ('COMMENT',       r'--[^\n]*'),
             ('STRING',        r'"[^"]*"|\'[^\']*\''),
@@ -74,10 +74,10 @@ class Editor(QTextEdit):
         prev_kind = None
         pos = 0
 
-        tabWidgetIndex = self.window().tab_widget.currentIndex()
+        tab_widget_index = self.window().tab_widget.currentIndex()
 
         if text == "":
-            self.window().tab_widget.setTabText(tabWidgetIndex, "untitled")
+            self.window().tab_widget.setTabText(tab_widget_index, "untitled")
             return 0
 
         while pos < len(text):
@@ -87,25 +87,25 @@ class Editor(QTextEdit):
                 continue
             kind = m.lastgroup
             value = m.group()
-            posStart = m.start()
+            pos_start = m.start()
             pos = m.end()
 
             if kind == 'SKIP':
-                if posStart == 0:
-                    self.window().tab_widget.setTabText(tabWidgetIndex, "untitled")
+                if pos_start == 0:
+                    self.window().tab_widget.setTabText(tab_widget_index, "untitled")
                 continue
 
             if kind == 'OP' and value in ('-', '~') and prev_kind not in OPERAND_KINDS:
                 num_match = number_re.match(text, pos)
                 if num_match:
-                    token_count += 1  # merged -3 counts as 1 token
+                    token_count += 1
                     prev_kind = 'NUMBER'
                     pos = num_match.end()
                     continue
 
-            if self.window().mainToolbar.fileOpening == False and kind == 'COMMENT' and posStart == 0:
-                tabName = value[2:].strip() or "untitled"
-                self.window().tab_widget.setTabText(tabWidgetIndex, tabName)
+            if self.window().main_toolbar.file_opening == False and kind == 'COMMENT' and pos_start == 0:
+                tab_name = value[2:].strip() or "untitled"
+                self.window().tab_widget.setTabText(tab_widget_index, tab_name)
 
             if kind not in FREE:
                 token_count += 1

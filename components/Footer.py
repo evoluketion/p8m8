@@ -9,7 +9,7 @@ class Footer(QToolBar):
         self.setFixedHeight(int(window_height * 0.06))
 
         self.line_count_label = QLabel("line 1/1", self)
-        self.line_count_label.setObjectName("lineCountLabel")
+        self.line_count_label.setObjectName("line_count_label")
         self.addWidget(self.line_count_label)
 
         spacer = FooterSpacer(self)
@@ -17,7 +17,7 @@ class Footer(QToolBar):
         self.addWidget(spacer)
 
         self.char_count_label = QLabel("0/8192", self)
-        self.char_count_label.setObjectName("charCountLabel")
+        self.char_count_label.setObjectName("char_count_label")
         self.addWidget(self.char_count_label)
 
 

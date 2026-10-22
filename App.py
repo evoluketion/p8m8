@@ -14,14 +14,14 @@ class p8m8(QMainWindow):
     def __init__(self):
 
         self.prefs = Prefs()
-        self.screenWidth = 1280
-        self.screenHeight = 720
+        self.screen_width = 1280
+        self.screen_height = 720
 
         super().__init__()
 
         QFontDatabase.addApplicationFont("assets/fonts/pico-8.otf")
 
-        self.width, self.height = self.screenWidth, self.screenHeight
+        self.width, self.height = self.screen_width, self.screen_height
         self.setMinimumSize(self.width, self.height)
         self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint)
         with open("styles/style.qss", "r") as f:
@@ -37,28 +37,28 @@ class p8m8(QMainWindow):
         with open("styles/style.qss", "r") as f:
             self.setStyleSheet(f.read())
 
-        self.mainToolbar = MainToolbar(self.screenHeight, self, Editor)
-        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.mainToolbar)
+        self.main_toolbar = MainToolbar(self.screen_height, self, Editor)
+        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.main_toolbar)
 
         self.editor = Editor(self)
         self.tab_widget = TabWidget()
         self.tab_widget.setTabsClosable(False)
 
-        tabLayout = self.window().tab_widget.getTabLayout(self.editor)
+        tab_layout = self.window().tab_widget.get_tab_layout(self.editor)
         
-        self.window().tab_widget.addTab(tabLayout, "untitled")
+        self.window().tab_widget.addTab(tab_layout, "untitled")
         self.window().tab_widget.addTab(QWidget(), "+")
-        self.window().tab_widget.tabBarClicked.connect(self.window().tab_widget.handleTabBarClicked)
+        self.window().tab_widget.tabBarClicked.connect(self.window().tab_widget.handle_tab_bar_clicked)
 
         self.layout.addWidget(self.tab_widget)
         self.window().tab_widget.setCurrentIndex(0)
 
-        self.footer = Footer(self.screenHeight, self)
+        self.footer = Footer(self.screen_height, self)
         self.addToolBar(Qt.ToolBarArea.BottomToolBarArea, self.footer)
 
     def changeEvent(self, event):
         if event.type() == QEvent.Type.WindowStateChange:
-            self.mainToolbar.window_state_changed(self.windowState())
+            self.main_toolbar.window_state_changed(self.windowState())
 
         super().changeEvent(event)
         event.accept()

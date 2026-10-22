@@ -34,7 +34,7 @@ QTextEdit {
     selection-color: #c2c3c7;
 }
 
-QTextEdit#lineNumberArea {
+QTextEdit#line_number_area {
     background-color: #1d2b53;
     color: #c2c3c7;
     border: none;
@@ -153,7 +153,7 @@ QToolButton:hover {
     color: #fff;
 }
 
-QLabel#lineCountLabel, QLabel#charCountLabel {
+QLabel#line_count_label, QLabel#char_count_label {
     color: #7e2553;
     font-family: "PICO-8";
     font-size: 22px;
