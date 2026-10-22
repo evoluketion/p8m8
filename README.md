@@ -32,18 +32,18 @@ python App.py
 
 ```
 App.py                     # Application entry point / main window
+assets/
+  fonts/pico-8.otf            # PICO-8 font
 components/
   Editor.py                 # Text editor widget + PICO-8 token counting
-  TabWidget.py               # Tab management, cartridge (de)serialization
-  MainToolbar.py             # Custom titlebar, menu bar, file open/save
   Footer.py                  # Status bar (line / token counts)
   LineNumberArea.py          # Gutter line numbers
+  MainToolbar.py             # Custom titlebar, menu bar, file open/save
+  TabWidget.py               # Tab management, cartridge (de)serialization
 config/
   prefs.py                   # Persisted user preferences (prefs.json)
 styles/
   style.qss                  # Application stylesheet
-assets/
-  fonts/pico-8.otf            # PICO-8 font
 ```
 
 ## Status
