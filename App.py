@@ -14,14 +14,14 @@ class p8m8(QMainWindow):
     def __init__(self):
 
         self.prefs = Prefs()
-        self.screenWidth = 1280
-        self.screenHeight = 720
+        self.screen_width = 1280
+        self.screen_height = 720
 
         super().__init__()
 
         QFontDatabase.addApplicationFont("assets/fonts/pico-8.otf")
 
-        self.width, self.height = self.screenWidth, self.screenHeight
+        self.width, self.height = self.screen_width, self.screen_height
         self.setMinimumSize(self.width, self.height)
         self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint)
         with open("styles/style.qss", "r") as f:
@@ -37,7 +37,7 @@ class p8m8(QMainWindow):
         with open("styles/style.qss", "r") as f:
             self.setStyleSheet(f.read())
 
-        self.main_toolbar = MainToolbar(self.screenHeight, self, Editor)
+        self.main_toolbar = MainToolbar(self.screen_height, self, Editor)
         self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.main_toolbar)
 
         self.editor = Editor(self)
@@ -53,7 +53,7 @@ class p8m8(QMainWindow):
         self.layout.addWidget(self.tab_widget)
         self.window().tab_widget.setCurrentIndex(0)
 
-        self.footer = Footer(self.screenHeight, self)
+        self.footer = Footer(self.screen_height, self)
         self.addToolBar(Qt.ToolBarArea.BottomToolBarArea, self.footer)
 
     def changeEvent(self, event):
