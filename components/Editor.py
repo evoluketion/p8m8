@@ -98,12 +98,12 @@ class Editor(QTextEdit):
             if kind == 'OP' and value in ('-', '~') and prev_kind not in OPERAND_KINDS:
                 num_match = number_re.match(text, pos)
                 if num_match:
-                    token_count += context_menu_event
+                    token_count += 1
                     prev_kind = 'NUMBER'
                     pos = num_match.end()
                     continue
 
-            if self.window().mainToolbar.fileOpening == False and kind == 'COMMENT' and pos_start == 0:
+            if self.window().main_toolbar.file_opening == False and kind == 'COMMENT' and pos_start == 0:
                 tab_name = value[2:].strip() or "untitled"
                 self.window().tab_widget.setTabText(tab_widget_index, tab_name)
 
@@ -114,7 +114,7 @@ class Editor(QTextEdit):
 
         return token_count
     
-    def context_menu_event(self, event):
+    def contextMenuEvent(self, event):
         menu = self.createStandardContextMenu()
         for action in menu.actions():
             action.setText(action.text().lower())

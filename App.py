@@ -37,16 +37,16 @@ class p8m8(QMainWindow):
         with open("styles/style.qss", "r") as f:
             self.setStyleSheet(f.read())
 
-        self.mainToolbar = MainToolbar(self.screenHeight, self, Editor)
-        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.mainToolbar)
+        self.main_toolbar = MainToolbar(self.screenHeight, self, Editor)
+        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.main_toolbar)
 
         self.editor = Editor(self)
         self.tab_widget = TabWidget()
         self.tab_widget.setTabsClosable(False)
 
-        tabLayout = self.window().tab_widget.get_tab_layout(self.editor)
+        tab_layout = self.window().tab_widget.get_tab_layout(self.editor)
         
-        self.window().tab_widget.addTab(tabLayout, "untitled")
+        self.window().tab_widget.addTab(tab_layout, "untitled")
         self.window().tab_widget.addTab(QWidget(), "+")
         self.window().tab_widget.tabBarClicked.connect(self.window().tab_widget.handle_tab_bar_clicked)
 
@@ -58,7 +58,7 @@ class p8m8(QMainWindow):
 
     def changeEvent(self, event):
         if event.type() == QEvent.Type.WindowStateChange:
-            self.mainToolbar.window_state_changed(self.windowState())
+            self.main_toolbar.window_state_changed(self.windowState())
 
         super().changeEvent(event)
         event.accept()
