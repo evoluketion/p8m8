@@ -13,6 +13,15 @@ class TabWidget(QTabWidget):
 
     def close_tab(self, index):
         self.removeTab(index)
+
+    def clear_tabs(self):
+        while self.count() > 1: # Gotta be 1 so the + sign for new tabs stays there
+            tab = self.widget(0)
+
+            self.removeTab(0)
+
+            if tab is not None:
+                tab.deleteLater()
     
     def get_tab_layout(self, editor):
 
