@@ -70,7 +70,7 @@ class MainToolbar(QToolBar):
 
         self.save_action = file_menu.actions()[2]
         self.save_action.triggered.connect(menu_bar.save_file)
-        self.save_action.setEnabled(False)  # Functionality not implemented yet, TODO
+        self.save_action.setEnabled(False) # Disabled by default as Application opens with blank file, no file name to execute a regular save
 
         save_as_action = file_menu.actions()[3]
         save_as_action.triggered.connect(menu_bar.save_file_as)
