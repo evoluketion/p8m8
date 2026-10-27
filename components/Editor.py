@@ -16,6 +16,8 @@ class Editor(QTextEdit):
         self.textChanged.connect(self.check_text_details)
         self.cursorPositionChanged.connect(self.check_current_line)
 
+        self.current_file_name = "p8m8_project.p8"
+
         if prefs.get("show_tab_spaces"):
             option = QTextOption()
             option.setFlags(QTextOption.Flag.ShowTabsAndSpaces)

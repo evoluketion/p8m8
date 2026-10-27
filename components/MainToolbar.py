@@ -68,8 +68,9 @@ class MainToolbar(QToolBar):
         open_action = file_menu.actions()[1]
         open_action.triggered.connect(menu_bar.open_file)
 
-        save_action = file_menu.actions()[2]
-        save_action.setEnabled(False)  # Functionality not implemented yet, TODO
+        self.save_action = file_menu.actions()[2]
+        self.save_action.triggered.connect(menu_bar.save_file)
+        self.save_action.setEnabled(False)  # Functionality not implemented yet, TODO
 
         save_as_action = file_menu.actions()[3]
         save_as_action.triggered.connect(menu_bar.save_file_as)
@@ -111,6 +112,9 @@ class MainToolbar(QToolBar):
             self.normal_action.setVisible(False)
             self.maximize_action.setVisible(True)
 
+    def change_save_button_state(self, status=False):
+            self.save_action.setEnabled(status)
+
 
 class MenuBar(QMenuBar):
 
@@ -127,6 +131,10 @@ class MenuBar(QMenuBar):
 
         file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Pico 8 Files (*.p8)")
 
+        if not file_name:
+            print ("Error handling file name. Please try again.")
+            return
+
         open_file_regex = [
             ('LUA',   r'__lua__(.*)\n__gfx__'),
             ('GFX',   r'__gfx__(.*)\n__label__'),
@@ -136,53 +144,82 @@ class MenuBar(QMenuBar):
             ('SFX',   r'__sfx__(.*)\n'),
         ]
 
-        if file_name:
+        self.window().editor.current_file_name = file_name
+        self.window().main_toolbar.change_save_button_state(True)
+        self.window().tab_widget.clear_tabs()  # Purge all tabs before adding new ones
 
-            self.window().tab_widget.clear_tabs()  # Purge all tabs before adding new ones
+        with open(file_name, 'r') as file:
+            raw_file_content = file.read()
+            sections = {}
+            for name, pattern in open_file_regex:
+                match = re.search(pattern, raw_file_content, re.DOTALL)
+                sections[name] = match.group(1).strip() if match else ""
 
-            with open(file_name, 'r') as file:
-                raw_file_content = file.read()
-                sections = {}
-                for name, pattern in open_file_regex:
-                    match = re.search(pattern, raw_file_content, re.DOTALL)
-                    sections[name] = match.group(1).strip() if match else ""
+            # Have included the other sections in case I want to add features related to them in the future, but for now only the LUA section is used
+            lua, gfx, label, gff, map_data, sfx = sections['LUA'], sections['GFX'], sections['LABEL'], sections['GFF'], sections['MAP'], sections['SFX']
 
-                # Have included the other sections in case I want to add features related to them in the future, but for now only the LUA section is used
-                lua, gfx, label, gff, map_data, sfx = sections['LUA'], sections['GFX'], sections['LABEL'], sections['GFF'], sections['MAP'], sections['SFX']
+            self.window().main_toolbar.file_opening = True
+            tab_contents = lua.split("-->8") if "-->8" in lua else [lua.strip()]
+            for i, content in enumerate(tab_contents):
+                editor = Editor(self)
+                stripped_content = content.strip()
+                editor.setPlainText(stripped_content)
 
-                self.window().main_toolbar.file_opening = True
-                tab_contents = lua.split("-->8") if "-->8" in lua else [lua.strip()]
-                for i, content in enumerate(tab_contents):
-                    editor = Editor(self)
-                    stripped_content = content.strip()
-                    editor.setPlainText(stripped_content)
+                tab_title = self.get_tab_name(stripped_content, file_name, i)
 
-                    tab_title = self.get_tab_name(stripped_content, file_name, i)
+                tab_layout = self.window().tab_widget.get_tab_layout(editor)
 
-                    tab_layout = self.window().tab_widget.get_tab_layout(editor)
+                self.window().tab_widget.addTab(tab_layout, tab_title)
 
-                    self.window().tab_widget.addTab(tab_layout, tab_title)
-
-            self.window().tab_widget.tabBar().moveTab(0, self.window().tab_widget.count() - 1)  # Move the + tab to the last position
-            self.window().tab_widget.setCurrentIndex(0)
-            self.window().main_toolbar.file_opening = False
+        self.window().tab_widget.tabBar().moveTab(0, self.window().tab_widget.count() - 1)  # Move the + tab to the last position
+        self.window().tab_widget.setCurrentIndex(0)
+        self.window().main_toolbar.file_opening = False
 
     def save_file_as(self):
         file_name, _ = QFileDialog.getSaveFileName(self, "Save File", "", "Pico 8 Files (*.p8)")
-        if file_name:
-            try:
-                # Editor should only be able to save files as Pico 8 cartridges
-                if not file_name.endswith(".p8"):
-                    file_name += ".p8"
-                
-                with open(file_name, 'w') as f:
-                    editor_text = str(self.window().tab_widget.format_file_content())
-                    print(f"Saving file with content:\n{editor_text}")
 
-                    f.write(editor_text)
-                    f.close()
-            except Exception as e:
-                print(f"Error saving file {e}")
+        if not file_name:
+            print ("Error handling file name. Please try again.")
+            return
+
+        try:
+            # Editor should only be able to save files as Pico 8 cartridges
+            if not file_name.endswith(".p8"):
+                file_name += ".p8"
+            
+            with open(file_name, 'w') as f:
+                editor_text = str(self.window().tab_widget.format_file_content())
+
+                f.write(editor_text)
+                f.close()
+
+            self.window().editor.current_file_name = file_name
+            self.window().main_toolbar.change_save_button_state(True)
+        except Exception as e:
+            print(f"Error saving file {e}")
+
+    def save_file(self):
+        file_name = self.window().editor.current_file_name
+
+        if not file_name:
+            print ("Error handling file name. Please try again.")
+            return
+        
+        try:
+            # Editor should only be able to save files as Pico 8 cartridges
+            if not file_name.endswith(".p8"):
+                file_name += ".p8"
+            
+            with open(file_name, 'w') as f:
+                editor_text = str(self.window().tab_widget.format_file_content())
+
+                # print(f"File Name: {file_name}")
+                # print(f"Editor Text: {editor_text}")
+
+                f.write(editor_text)
+                f.close()
+        except Exception as e:
+            print(f"Error saving file {e}")
 
     def get_tab_name(self, stripped_content, file_name, i):
         first_line = stripped_content.splitlines()[0] if stripped_content else "untitled"
