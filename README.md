@@ -48,4 +48,4 @@ styles/
 
 ## Status
 
-Early-stage / work in progress. `new` and `save` (in-place) menu actions are not yet implemented — use `open` and `save as` for now.
+Early-stage / work in progress. The `new` (in-place) menu action is not yet implemented.
