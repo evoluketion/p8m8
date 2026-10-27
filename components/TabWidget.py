@@ -61,8 +61,8 @@ class TabWidget(QTabWidget):
             comment_match = re.match(r'--\s*(.*)', first_line)
             if not comment_match:
                 editor_text = f"--untitled\n {editor_text}"
-            
-            file_content = f"{file_content}\n-->8\n{editor_text}" if file_content else editor_text
+
+            file_content = f"{editor_text}\n-->8\n{file_content}" if file_content else editor_text
     
         return file_specs_str + file_content + gfx_str.replace(" ", "")
 
